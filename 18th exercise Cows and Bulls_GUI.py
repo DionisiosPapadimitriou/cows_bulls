@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import simpledialog
 from tkinter import messagebox
-import random,sys
+import random,sys,string
 import tkinter.scrolledtext as scrolled
 from datetime import date
 today = date.today()
@@ -86,32 +86,41 @@ def highscore():
 
 	with open("highscore.txt",'a+') as score:
 		score.write(user +" "+  today.strftime("%d/%m/%Y") +" attempts: " + str(tries+1) + "\n")
-    
+
+def validate_num(num):
+    for i in num:
+        if i not in string.digits:
+            return False
+    return True
+
 ##When Try is pressed
 def click():
 	global a,tries, login_flag
 	x=user_num.get()
 	output.delete(0.0,END)
 	if login_flag==True:
-		while True:
-			try:
-				if len(x)>len(a):#when input number has more digits than the secret number
-					output.insert(END,"Please give number with " +str(len(a))+" digits")
-					break
-				elif list(x)!=a:
-					check(x,a)
-					#if not IndexError:
-					tries+=1
-					output.insert(END,"Please try again")
-					break
-				else:
-					output.insert(END,user + " you are the WINNER!!! You made it in "+str(tries+1)+" attempts")
-					login_flag=False
-					highscore()
-					break
-			except NameError:#when secret number is not loaded
-				output.insert(END,"Please Load secret number first!")
-				break
+         if validate_num(x)==True:
+            while True:
+                try:
+                    if len(x)>len(a):#when input number has more digits than the secret number
+                        output.insert(END,"Please give number with " +str(len(a))+" digits")
+                        break
+                    elif list(x)!=a:
+                        check(x,a)
+                        #if not IndexError:
+                        tries+=1
+                        output.insert(END,"Please try again")
+                        break
+                    else:
+                        output.insert(END,user + " you are the WINNER!!! You made it in "+str(tries+1)+" attempts")
+                        login_flag=False
+                        highscore()
+                        break
+                except NameError:#when secret number is not loaded
+                    output.insert(END,"Please Load secret number first!")
+                    break
+         else:
+             output.insert(END, "Please enter a valid number. Only digits 0-9")
 	else:
 		output.insert(END,"Please Log in first!")
 	#print(str(login_flag) + " submit pressed")
