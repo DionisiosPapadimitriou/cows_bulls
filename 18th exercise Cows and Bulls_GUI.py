@@ -7,7 +7,6 @@ from datetime import date
 today = date.today()
 global login_flag
 login_flag=False
-
 ##close the application
 def close_window():
 	w.destroy()
@@ -49,9 +48,9 @@ def check(x,y):
             output.insert(END,"Please give a correct number!\n")
             break
             
-## Log in button pressed
+## Submit button pressed
 def click2():
-    global user,login_flag
+    global user,login_flag,new_user_flag
     c=0
     output.delete(0.0,END)
     user=user_name.get()
@@ -63,21 +62,29 @@ def click2():
     for item in list_file:#this is to count the lines in cb_users
     	c+=1
     #print(range(0,c))
-    for i in range(c-1):
-    	if user == list_file[i]  and password == list_file[i+1]:
-    		messagebox.showinfo("Success", "succesful login")
-    		login_flag=True
-    		r.close()
-    	if user == list_file[i] and password != list_file[i+1]:
-  	  	messagebox.showinfo("Fail", "Unsuccesful login")
-    		r.close()
-    if user not in rfile:
-  	  r.close()
-  	  messagebox.showinfo("New user", "You are  registered as a new user.\nPlease remember your credentials for future use.")
-  	  with open('cb_users.txt', 'a+') as f:
-    		f.write(user+"\n")
-    		f.write(password+"\n")
-    		login_flag=True
+    if new_user_flag==False:
+    	for i in range(c-1):
+	    	if user == list_file[i]  and password == list_file[i+1]:
+	    		messagebox.showinfo("Success", "succesful login")
+	    		login_flag=True
+	    		r.close()
+	    	elif user == list_file[i] and password != list_file[i+1]:
+	  	  	messagebox.showinfo("Fail", "Invalid password")
+	    		r.close()
+	    	elif user not in rfile:
+	    		messagebox.showinfo("Fail", "Invalid user")
+	    		r.close()
+	if new_user_flag ==True:	
+		if user not in rfile:
+	  	  r.close()
+	  	  messagebox.showinfo("New user", "You are  registered as a new user.\nPlease remember your credentials for future use.")
+	  	  with open('cb_users.txt', 'a+') as f:
+	    		f.write(user+"\n")
+	    		f.write(password+"\n")
+	    		login_flag=True
+	    else:
+	    	messagebox.showinfo("Fail", "User already exists")
+	    	
     #print(login_flag)
     login.destroy()
     
@@ -125,17 +132,25 @@ def click():
 		output.insert(END,"Please Log in first!")
 	#print(str(login_flag) + " submit pressed")
 				
+def new_user():
+	global new_user_flag
+	new_user_flag=True
+	log_in()	
+def sign_in():
+	global new_user_flag
+	new_user_flag=False
+	log_in()	
 				
 ##Login window
 def log_in():
-    global user_name,user_pass,login,history
+    global user_name,user_pass,login,history,new_user_flag
     login=Tk()
     login.title("log in")
     user_name=Entry(login, width=10,bg="white")
     user_name.grid(row=0,column=1,columnspan=3)
     user_pass=Entry(login, width=10,bg="white")
     user_pass.grid(row=1,column=1,columnspan=3)
-    Button(login,text="SUBMIT", width=10,command=click2).grid(row=2,column=1,columnspan=3)
+    Button(login,text="Submit", width=10,command=click2).grid(row=2,column=1,columnspan=3)
     login.mainloop()
 
 ## Main window
@@ -155,5 +170,6 @@ history = scrolled.ScrolledText(w, undo=True,width=20,height=15)
 history.grid(row=0,column=5,sticky=E,padx=5,pady=5,rowspan=7)
 Button(w,text="LOAD SECRET NUMBER", width=18,command=num_gen).grid(row=6,column=0,columnspan=3,sticky=W)
 Button(w,text="EXIT", width=4,command=close_window).grid(row=6,column=2,columnspan=3,sticky=E)
-Button(w,text="Log in",width=6,command=log_in).grid(row=7,column=1,columnspan=3)
+Button(w,text="Log in",width=6,command=sign_in).grid(row=7,column=1,columnspan=3)
+Button(w,text="New user",width=6,command=new_user).grid(row=8,column=1,columnspan=3)
 w.mainloop()
